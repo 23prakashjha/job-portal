@@ -16,12 +16,12 @@ app.use(cors());
 
 // Parse JSON payloads
 app.use(express.json());
-
-// Optional: parse URL-encoded forms (for older forms)
 app.use(express.urlencoded({ extended: true }));
 
-// Initialize Database
-initializeDatabase();
+// Health check route
+app.get("/", (req, res) => {
+  res.send("🚀 Job Portal API Running");
+});
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -29,19 +29,24 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/recruiter", recruiterRoutes);
 app.use("/api/applications", applicationRoutes);
 
-// Health check route
-app.get("/", (req, res) => {
-  res.send("🚀 Job Portal API Running");
-});
-
 // Global error handler (optional)
 app.use((err, req, res, next) => {
   console.error("Global Error:", err);
   res.status(500).json({ message: "Something went wrong!" });
 });
 
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+// Start server AFTER DB is ready
+const startServer = async () => {
+  try {
+    await initializeDatabase(); // ✅ Await DB initialization
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ Failed to start server due to DB error:", err.message);
+    process.exit(1); // Exit process if DB cannot connect
+  }
+};
+
+startServer();

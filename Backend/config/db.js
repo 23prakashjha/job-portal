@@ -3,26 +3,33 @@ require("dotenv").config();
 
 let pool;
 
-const initializeDatabase = async () => {
+/**
+ * Sleep function for retrying
+ */
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const initializeDatabase = async (retries = 5, delay = 5000) => {
   try {
     // Step 1: Create connection without DB
     const connection = await mysql.createConnection({
-      host: process.env.DB_HOST || "localhost",
-      user: process.env.DB_USER || "root",
-      password: process.env.DB_PASSWORD || "",
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
+      connectTimeout: 10000, // 10 seconds
     });
 
-    // Step 2: Create database
+    // Step 2: Create database if it doesn't exist
     await connection.query(`CREATE DATABASE IF NOT EXISTS job_portal`);
     console.log("✅ Database checked/created");
 
     await connection.end();
 
-    // Step 3: Create pool
+    // Step 3: Create pool with DB
     pool = mysql.createPool({
-      host: process.env.DB_HOST || "localhost",
-      user: process.env.DB_USER || "root",
-      password: process.env.DB_PASSWORD || "",
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
       database: "job_portal",
       waitForConnections: true,
       connectionLimit: 10,
@@ -31,17 +38,24 @@ const initializeDatabase = async () => {
 
     console.log("✅ Connected to MySQL Database");
 
+    // Step 4: Create tables
     await createTables();
-
   } catch (error) {
-    console.error("❌ Database Initialization Failed:", error);
-    process.exit(1);
+    console.error(`❌ Database Initialization Failed: ${error.message}`);
+
+    if (retries > 0) {
+      console.log(`⏳ Retrying in ${delay / 1000}s... (${retries} retries left)`);
+      await sleep(delay);
+      return initializeDatabase(retries - 1, delay);
+    } else {
+      console.error("❌ All retries failed. Exiting process.");
+      process.exit(1);
+    }
   }
 };
 
 const createTables = async () => {
   try {
-
     // ================= USERS TABLE =================
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -56,7 +70,6 @@ const createTables = async () => {
       )
     `);
     console.log("✅ Users table ready");
-
 
     // ================= JOBS TABLE =================
     await pool.query(`
@@ -94,7 +107,6 @@ const createTables = async () => {
     `);
     console.log("✅ Jobs table ready");
 
-
     // ================= APPLICATIONS TABLE =================
     await pool.query(`
       CREATE TABLE IF NOT EXISTS applications (
@@ -115,7 +127,6 @@ const createTables = async () => {
     `);
     console.log("✅ Applications table ready");
 
-
     // ================= RESUMES TABLE =================
     await pool.query(`
       CREATE TABLE IF NOT EXISTS resumes (
@@ -134,7 +145,6 @@ const createTables = async () => {
       )
     `);
     console.log("✅ Resumes table ready");
-
 
     // ================= ATS SCORES TABLE =================
     await pool.query(`
@@ -156,7 +166,8 @@ const createTables = async () => {
     console.log("✅ ATS Scores table ready");
 
   } catch (error) {
-    console.error("❌ Error Creating Tables:", error);
+    console.error("❌ Error Creating Tables:", error.message);
+    process.exit(1);
   }
 };
 
@@ -164,4 +175,5 @@ module.exports = {
   initializeDatabase,
   getPool: () => pool,
 };
+
 

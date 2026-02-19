@@ -28,7 +28,7 @@ const UserAuth = () => {
     try {
       if (isLogin) {
         const res = await axios.post(
-          "http://localhost:5000/api/auth/login",
+          "https://job-portal-wizd.onrender.com/api/auth/login",
           {
             email: form.email,
             password: form.password,
@@ -42,7 +42,7 @@ const UserAuth = () => {
         navigate("/");
       } else {
         await axios.post(
-          "http://localhost:5000/api/auth/register",
+          "https://job-portal-wizd.onrender.com/api/auth/register",
           form
         );
 
@@ -55,7 +55,7 @@ const UserAuth = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/api/auth/google";
+    window.location.href = "https://job-portal-wizd.onrender.com/api/auth/google";
   };
 
   return (

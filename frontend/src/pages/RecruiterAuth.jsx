@@ -37,7 +37,7 @@ const RecruiterAuth = () => {
     try {
       if (isLogin) {
         const res = await axios.post(
-          "http://localhost:5000/api/auth/login",
+          "https://job-portal-wizd.onrender.com/api/auth/login",
           {
             email: form.email,
             password: form.password,
@@ -57,7 +57,7 @@ const RecruiterAuth = () => {
         navigate("/recruiter/dashboard");
       } else {
         await axios.post(
-          "http://localhost:5000/api/auth/recruiter-register",
+          "https://job-portal-wizd.onrender.com/api/auth/recruiter-register",
           form
         );
 

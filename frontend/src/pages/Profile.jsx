@@ -32,13 +32,13 @@ const Profile = () => {
       setLoading(true);
 
       const { data: userData } = await axios.get(
-        "http://localhost:5000/api/auth/profile",
+        "https://job-portal-wizd.onrender.com/api/auth/profile",
         axiosConfig
       );
       setUser(userData);
 
       const { data: appData } = await axios.get(
-        "http://localhost:5000/api/applications/my",
+        "https://job-portal-wizd.onrender.com/api/applications/my",
         axiosConfig
       );
       setApplications(appData);
@@ -53,7 +53,7 @@ const Profile = () => {
   const withdrawApplication = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/applications/${id}`,
+        `https://job-portal-wizd.onrender.com/api/applications/${id}`,
         axiosConfig
       );
       toast.success("Application withdrawn successfully");
@@ -159,7 +159,7 @@ const Profile = () => {
 
                   {app.resume && (
                     <a
-                      href={`http://localhost:5000${app.resume}`}
+                      href={`https://job-portal-wizd.onrender.com${app.resume}`}
                       target="_blank"
                       rel="noreferrer"
                       className="flex items-center gap-2 mt-4 text-indigo-600 hover:underline"

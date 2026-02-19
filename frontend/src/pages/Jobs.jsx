@@ -44,7 +44,7 @@ const Jobs = () => {
   // ================= FETCH JOBS =================
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/jobs")
+      .get("https://job-portal-wizd.onrender.com/api/jobs")
       .then((res) => {
         const data = res.data || [];
         setJobs(data);

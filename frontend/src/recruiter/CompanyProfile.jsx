@@ -29,7 +29,7 @@ const CompanyProfile = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          "http://localhost:5000/api/recruiter/company-profile",
+          "https://job-portal-wizd.onrender.com/api/recruiter/company-profile",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -68,7 +68,7 @@ const CompanyProfile = () => {
       });
 
       await axios.put(
-        "http://localhost:5000/api/recruiter/company-profile",
+        "https://job-portal-wizd.onrender.com/api/recruiter/company-profile",
         formData,
         {
           headers: {

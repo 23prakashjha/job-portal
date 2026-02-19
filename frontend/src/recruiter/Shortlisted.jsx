@@ -24,7 +24,7 @@ const Shortlisted = () => {
   const fetchShortlisted = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/applications/job/${jobId}/shortlisted`,
+        `https://job-portal-wizd.onrender.com/api/applications/job/${jobId}/shortlisted`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setData(res.data);
@@ -87,7 +87,7 @@ const Shortlisted = () => {
 
                 {item.resume && (
                   <a
-                    href={`http://localhost:5000${item.resume}`}
+                    href={`https://job-portal-wizd.onrender.com${item.resume}`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-2 mt-4 text-indigo-600 hover:underline"

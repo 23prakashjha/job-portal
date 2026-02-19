@@ -12,7 +12,7 @@ const ManageJobs = () => {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/jobs");
+      const res = await axios.get("https://job-portal-wizd.onrender.com/api/jobs");
       setJobs(res.data);
       setFilteredJobs(res.data);
     } catch (error) {
@@ -31,7 +31,7 @@ const ManageJobs = () => {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/jobs/${deleteId}`,
+        `https://job-portal-wizd.onrender.com/api/jobs/${deleteId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

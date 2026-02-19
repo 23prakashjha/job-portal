@@ -82,7 +82,7 @@ const AddJob = () => {
         benefits: form.benefits.trim(),
       };
 
-      await axios.post("http://localhost:5000/api/jobs", jobData, {
+      await axios.post("https://job-portal-wizd.onrender.com/api/jobs", jobData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

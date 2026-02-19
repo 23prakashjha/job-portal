@@ -39,7 +39,7 @@ const JobDetails = () => {
     const fetchJob = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:5000/api/jobs/${id}`,
+          `https://job-portal-wizd.onrender.com/api/jobs/${id}`,
           axiosConfig
         );
 
@@ -47,14 +47,14 @@ const JobDetails = () => {
 
         if (user && token) {
           const { data: applied } = await axios.get(
-            `http://localhost:5000/api/applications/check/${id}`,
+            `https://job-portal-wizd.onrender.com/api/applications/check/${id}`,
             axiosConfig
           );
           setAlreadyApplied(applied.applied);
 
           if (applied.applied) {
             const { data: statusRes } = await axios.get(
-              `http://localhost:5000/api/applications/status/${id}`,
+              `https://job-portal-wizd.onrender.com/api/applications/status/${id}`,
               axiosConfig
             );
             setStatus(statusRes.status);
@@ -83,7 +83,7 @@ const JobDetails = () => {
       formData.append("jobId", id);
 
       await axios.post(
-        "http://localhost:5000/api/applications",
+        "https://job-portal-wizd.onrender.com/api/applications",
         formData,
         {
           headers: {

@@ -29,7 +29,7 @@ const Applicants = () => {
   const fetchApplicants = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/applications/job/${jobId}/applicants`,
+        `https://job-portal-wizd.onrender.com/api/applications/job/${jobId}/applicants`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setApplicants(res.data);
@@ -54,7 +54,7 @@ const Applicants = () => {
   const handleAction = async () => {
     try {
       await axios.put(
-        `http://localhost:5000/api/applications/${actionType}/${actionId}`,
+        `https://job-portal-wizd.onrender.com/api/applications/${actionType}/${actionId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -140,7 +140,7 @@ const Applicants = () => {
 
                 {app.resume && (
                   <a
-                    href={`http://localhost:5000${app.resume}`}
+                    href={`https://job-portal-wizd.onrender.com${app.resume}`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-2 mt-4 text-indigo-600 hover:underline"

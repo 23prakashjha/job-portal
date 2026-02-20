@@ -14,7 +14,7 @@ const app = express();
 
 // ------------------- CORS -------------------
 app.use(cors({
-  origin: "https://job-portal-omega-five.vercel.app", // frontend URL
+  origin: "https://job-portal-wheat-one.vercel.app/", // frontend URL
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true, // allow cookies if needed
 }));

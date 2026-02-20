@@ -21,7 +21,8 @@ const register = async (req, res) => {
 
     res.json({ message: "User registered successfully" });
   } catch (err) {
-    res.status(500).json(err);
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -30,6 +31,11 @@ const recruiterRegister = async (req, res) => {
   const pool = getPool();
 
   try {
+    // Check if email already exists
+    const [existing] = await pool.query("SELECT * FROM users WHERE email=?", [email]);
+    if (existing.length > 0)
+      return res.status(400).json({ message: "Email already exists" });
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
@@ -39,7 +45,8 @@ const recruiterRegister = async (req, res) => {
 
     res.json({ message: "Recruiter registered successfully" });
   } catch (err) {
-    res.status(500).json(err);
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -63,18 +70,22 @@ const login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.json({ token, user });
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (err) {
-    res.status(500).json(err);
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 const getProfile = async (req, res) => {
   const pool = getPool();
-  const [user] = await pool.query("SELECT * FROM users WHERE id=?", [
-    req.user.id,
-  ]);
-  res.json(user[0]);
+  try {
+    const [user] = await pool.query("SELECT * FROM users WHERE id=?", [req.user.id]);
+    res.json(user[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 module.exports = {

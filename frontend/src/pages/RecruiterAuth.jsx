@@ -36,11 +36,15 @@ const RecruiterAuth = () => {
 
     try {
       if (isLogin) {
+        // Login
         const res = await axios.post(
           "https://job-portal-wizd.onrender.com/api/auth/login",
           {
             email: form.email,
             password: form.password,
+          },
+          {
+            headers: { "Content-Type": "application/json" },
           }
         );
 
@@ -50,34 +54,38 @@ const RecruiterAuth = () => {
           return;
         }
 
+        // Save token and user info
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
 
         toast.success("Recruiter Login Successful!");
         navigate("/recruiter/dashboard");
       } else {
+        // Register
         await axios.post(
           "https://job-portal-wizd.onrender.com/api/auth/recruiter-register",
           form,
-          { headers: { "Content-Type": "application/json" } }
+          {
+            headers: { "Content-Type": "application/json" },
+          }
         );
 
         toast.success("Recruiter Registered Successfully!");
         toggleMode();
       }
     } catch (err) {
+      console.error("Error:", err);
       toast.error(err.response?.data?.message || "Something went wrong");
-      console.error(err);
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="bg-black/20 backdrop-blur-xl shadow-2xl rounded-3xl p-8 w-full max-w-md transition-all duration-300">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
+      <div className="bg-white shadow-2xl rounded-3xl p-8 w-full max-w-md transition-all duration-300">
         <div className="flex justify-center mb-4">
-          <FaBuilding className="text-black text-4xl" />
+          <FaBuilding className="text-green-600 text-4xl" />
         </div>
 
         <h2 className="text-3xl font-bold text-black text-center mb-6">
@@ -94,7 +102,7 @@ const RecruiterAuth = () => {
                 placeholder="Full Name"
                 onChange={handleChange}
                 required
-                className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-400 outline-none"
+                className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-400 outline-none"
               />
 
               <input
@@ -104,7 +112,7 @@ const RecruiterAuth = () => {
                 placeholder="Company Name"
                 onChange={handleChange}
                 required
-                className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-400 outline-none"
+                className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-400 outline-none"
               />
             </>
           )}
@@ -116,7 +124,7 @@ const RecruiterAuth = () => {
             placeholder="Email Address"
             onChange={handleChange}
             required
-            className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-400 outline-none"
+            className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-400 outline-none"
           />
 
           <div className="relative">
@@ -127,7 +135,7 @@ const RecruiterAuth = () => {
               placeholder="Password"
               onChange={handleChange}
               required
-              className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-400 outline-none"
+              className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-400 outline-none"
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
@@ -140,17 +148,17 @@ const RecruiterAuth = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-white text-green-600 py-3 rounded-lg font-semibold hover:bg-gray-200 transition duration-300"
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300 disabled:opacity-50"
           >
             {loading ? "Please wait..." : isLogin ? "Login" : "Register"}
           </button>
         </form>
 
         <p className="text-center text-black mt-6">
-          {isLogin ? "Don't have recruiter account?" : "Already registered?"}
+          {isLogin ? "Don't have a recruiter account?" : "Already registered?"}
           <button
             onClick={toggleMode}
-            className="ml-2 font-semibold underline hover:text-black-200"
+            className="ml-2 font-semibold underline hover:text-green-700"
           >
             {isLogin ? "Register" : "Login"}
           </button>
@@ -161,4 +169,5 @@ const RecruiterAuth = () => {
 };
 
 export default RecruiterAuth;
+
 

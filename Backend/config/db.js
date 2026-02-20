@@ -1,3 +1,4 @@
+// config/db.js
 const mysql = require("mysql2/promise");
 require("dotenv").config();
 
@@ -10,19 +11,18 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const initializeDatabase = async (retries = 5, delay = 5000) => {
   try {
-    // Step 1: Create connection without DB
+    // Step 1: Create temporary connection without database
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
-      connectTimeout: 10000, // 10 seconds
+      connectTimeout: 10000,
     });
 
     // Step 2: Create database if it doesn't exist
     await connection.query(`CREATE DATABASE IF NOT EXISTS job_portal`);
     console.log("✅ Database checked/created");
-
     await connection.end();
 
     // Step 3: Create pool with DB
@@ -40,6 +40,8 @@ const initializeDatabase = async (retries = 5, delay = 5000) => {
 
     // Step 4: Create tables
     await createTables();
+
+    return pool;
   } catch (error) {
     console.error(`❌ Database Initialization Failed: ${error.message}`);
 
@@ -48,13 +50,15 @@ const initializeDatabase = async (retries = 5, delay = 5000) => {
       await sleep(delay);
       return initializeDatabase(retries - 1, delay);
     } else {
-      console.error("❌ All retries failed. Exiting process.");
-      process.exit(1);
+      console.error("❌ All retries failed.");
+      throw error;
     }
   }
 };
 
 const createTables = async () => {
+  if (!pool) throw new Error("Database pool is not initialized");
+
   try {
     // ================= USERS TABLE =================
     await pool.query(`
@@ -95,14 +99,10 @@ const createTables = async () => {
         status ENUM('open','closed') DEFAULT 'open',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
         INDEX idx_recruiter (recruiter_id),
         INDEX idx_category (category),
         INDEX idx_job_type (job_type),
-
-        FOREIGN KEY (recruiter_id) 
-        REFERENCES users(id) 
-        ON DELETE CASCADE
+        FOREIGN KEY (recruiter_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
     console.log("✅ Jobs table ready");
@@ -117,10 +117,8 @@ const createTables = async () => {
         resume VARCHAR(255),
         status ENUM('applied','shortlisted','rejected') DEFAULT 'applied',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
         INDEX idx_job (job_id),
         INDEX idx_user (user_id),
-
         FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
@@ -138,9 +136,7 @@ const createTables = async () => {
         skills TEXT,
         projects TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
         INDEX idx_resume_user (user_id),
-
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
@@ -155,10 +151,8 @@ const createTables = async () => {
         score INT,
         matched_keywords TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
         INDEX idx_ats_user (user_id),
         INDEX idx_ats_job (job_id),
-
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
       )
@@ -167,13 +161,14 @@ const createTables = async () => {
 
   } catch (error) {
     console.error("❌ Error Creating Tables:", error.message);
-    process.exit(1);
+    throw error;
   }
 };
 
 module.exports = {
   initializeDatabase,
-  getPool: () => pool,
+  getPool: () => {
+    if (!pool) throw new Error("Database pool not initialized yet");
+    return pool;
+  },
 };
-
-

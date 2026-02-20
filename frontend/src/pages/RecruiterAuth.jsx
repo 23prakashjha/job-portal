@@ -58,7 +58,8 @@ const RecruiterAuth = () => {
       } else {
         await axios.post(
           "https://job-portal-wizd.onrender.com/api/auth/recruiter-register",
-          form
+          form,
+          { headers: { "Content-Type": "application/json" } }
         );
 
         toast.success("Recruiter Registered Successfully!");
@@ -66,15 +67,15 @@ const RecruiterAuth = () => {
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong");
+      console.error(err);
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center  px-4">
+    <div className="min-h-screen flex items-center justify-center px-4">
       <div className="bg-black/20 backdrop-blur-xl shadow-2xl rounded-3xl p-8 w-full max-w-md transition-all duration-300">
-        
         <div className="flex justify-center mb-4">
           <FaBuilding className="text-black text-4xl" />
         </div>
@@ -84,7 +85,6 @@ const RecruiterAuth = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           {!isLogin && (
             <>
               <input
@@ -119,7 +119,6 @@ const RecruiterAuth = () => {
             className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-400 outline-none"
           />
 
-          {/* Password Field with Toggle */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -143,19 +142,12 @@ const RecruiterAuth = () => {
             disabled={loading}
             className="w-full bg-white text-green-600 py-3 rounded-lg font-semibold hover:bg-gray-200 transition duration-300"
           >
-            {loading
-              ? "Please wait..."
-              : isLogin
-              ? "Login"
-              : "Register"}
+            {loading ? "Please wait..." : isLogin ? "Login" : "Register"}
           </button>
         </form>
 
         <p className="text-center text-black mt-6">
-          {isLogin
-            ? "Don't have recruiter account?"
-            : "Already registered?"}
-
+          {isLogin ? "Don't have recruiter account?" : "Already registered?"}
           <button
             onClick={toggleMode}
             className="ml-2 font-semibold underline hover:text-black-200"
@@ -169,3 +161,4 @@ const RecruiterAuth = () => {
 };
 
 export default RecruiterAuth;
+

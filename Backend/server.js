@@ -11,14 +11,18 @@ const applicationRoutes = require("./routes/applicationRoutes");
 
 const app = express();
 
-// Enable CORS
-app.use(cors());
+// CORS configuration
+app.use(cors({
+  origin: "https://job-portal-omega-five.vercel.app", // your frontend
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
+}));
 
-// Parse JSON payloads
+// Parse JSON and URL-encoded payloads
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check route
+// Health check
 app.get("/", (req, res) => {
   res.send("🚀 Job Portal API Running");
 });
@@ -29,24 +33,28 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/recruiter", recruiterRoutes);
 app.use("/api/applications", applicationRoutes);
 
-// Global error handler (optional)
+// Preflight OPTIONS handler (for CORS)
+app.options("*", cors());
+
+// Global error handler
 app.use((err, req, res, next) => {
   console.error("Global Error:", err);
   res.status(500).json({ message: "Something went wrong!" });
 });
 
-// Start server AFTER DB is ready
+// Start server after DB initialization
 const startServer = async () => {
   try {
-    await initializeDatabase(); // ✅ Await DB initialization
+    await initializeDatabase();
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
   } catch (err) {
     console.error("❌ Failed to start server due to DB error:", err.message);
-    process.exit(1); // Exit process if DB cannot connect
+    process.exit(1);
   }
 };
 
 startServer();
+
